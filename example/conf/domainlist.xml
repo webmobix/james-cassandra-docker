@@ -20,7 +20,7 @@
 
 <domainlist>
   <domainnames>
-    <domainname>yourdomain.org</domainname>
+    <!-- <domainname>yourdomain.org</domainname> -->
   </domainnames>
   <autodetect>false</autodetect>
   <autodetectIP>true</autodetectIP>

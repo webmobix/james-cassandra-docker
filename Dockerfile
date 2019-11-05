@@ -22,8 +22,6 @@ COPY --from=build /opt/james-project/server/container/guice/cassandra-rabbitmq-g
 COPY --from=build /opt/james-project/server/container/guice/cassandra-rabbitmq-guice/target/james-server-cassandra-rabbitmq-guice.lib james-server-cassandra-rabbitmq-guice.lib
 COPY --from=build /opt/james-project/dockerfiles/run/guice/cassandra/destination/conf conf
 
-# RUN chown -R 1001:1001 /opt/james
-
 RUN wget -O /usr/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
 RUN chmod +x /usr/bin/dumb-init
 
@@ -39,4 +37,4 @@ EXPOSE 3110 3995 3143 3993 3025 3465 8000
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-CMD ["java", "-Dworking.directory=/opt/james", "-jar", "james-server-cassandra-rabbitmq-guice.jar"]
+CMD ["java", "-Dworking.directory=/opt/james", "-Dlogback.configurationFile=/opt/james/conf/logback.xml", "-Xmx1024m", "-jar", "james-server-cassandra-rabbitmq-guice.jar"]
