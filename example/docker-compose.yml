@@ -1,0 +1,77 @@
+version: "3"
+services:
+  james:
+    # build: ../
+    image: webmobix/james-cassandra-rabbitmq:3.4.0
+    # image: webmobix/james-cassandra:3.4.0
+    ports:
+      - "3025:3025"
+      - "3465:3465"
+      - "3110:3110"
+      - "3995:3995"
+      - "3143:3143"
+      - "3993:3993"
+      - "8000:8000"
+    networks:
+      - james
+    volumes:
+      - ./conf:/opt/james/conf
+      - mail:/opt/james/var/mail
+      - store:/opt/james/var/store
+    links:
+      - cassandra
+      - elasticsearch
+      - rabbitmq
+    depends_on:
+      - cassandra
+      - elasticsearch
+      - rabbitmq
+  cassandra:
+    image: cassandra:3
+    environment:
+      CASSANDRA_SEEDS: cassandra
+    ports:
+      - "9042:9042"
+    networks:
+      - james
+    volumes:
+      - ./cassandra/cassandra.yaml:/etc/cassandra/cassandra.yaml
+      - cassandra:/var/lib/cassandra
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - james
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.3.2
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - james
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    environment:
+      RABBITMQ_HIPE_COMPILE: 1
+    ports:
+      - "15672:15672"
+    expose:
+      - "5672"
+      - "4369"
+      - "35197"
+    networks:
+      - james
+volumes:
+  mail: {}
+  store: {}
+  cassandra: {}
+networks:
+  james:
